@@ -8,6 +8,7 @@ import time
 import xml.etree.ElementTree as etree
 
 class session:
+    # Private Utility Functions
     def __init__(self, license_key):
         self.__license_key = license_key
         self.__sms_action_url = "http://sms2.cdyne.com/sms.svc"
@@ -48,6 +49,7 @@ class session:
                 dictionary[element_name] = element_value
         return dictionary
 
+    # SMS Sending Functions
     def simple_sms_send(self, phone_number, message):
         data = {"PhoneNumber": phone_number,
                 "LicenseKey": self.__license_key,
@@ -77,6 +79,22 @@ class session:
                 "ScheduledDateTIme": scheduled_date_time,
                 "StatusPostbackURL": status_postback_url}
         request_url = self.__sms_action_url + "/AdvancedSMSSend"
+        request_url += "?%s" % urllib.urlencode(data)
+        response = self.__get_request(request_url)
+        return self.__xml_to_dictionary(response)
+
+    # Message Status Functions
+    def get_message_status(self, message_id):
+        data = {"MessageID": message_id}
+        request_url = self.__sms_action_url + "/GetMessageStatus"
+        request_url += "?%s" % urllib.urlencode(data)
+        response = self.__get_request(request_url)
+        return self.__xml_to_dictionary(response)
+
+    def get_message_status_by_reference_id(self, reference_id):
+        data = {"ReferenceID": reference_id,
+                "LicenseKey": self.__license_key}
+        request_url = self.__sms_action_url + "/GetMessageStatusByReferenceID"
         request_url += "?%s" % urllib.urlencode(data)
         response = self.__get_request(request_url)
         return self.__xml_to_dictionary(response)
