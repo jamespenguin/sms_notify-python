@@ -30,7 +30,6 @@ class session:
             except:
                 import traceback
                 traceback.print_exc()
-                count += 1
         raise NameError("Failed to grab URL: %s", request)
 
     def __xml_to_dictionary(self, xml):
