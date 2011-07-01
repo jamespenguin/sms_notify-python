@@ -5,6 +5,7 @@
 #
 import socket, httplib, urllib, urllib2
 import xml.etree.ElementTree as etree
+import json
 import time
 
 class session:
@@ -68,19 +69,18 @@ class session:
                 "SatusPostBackURL": postback_url}
         return self.__send_request(data, "SimpleSMSSendWithPostback")
 
-    def advanced_sms_send(self, assigned_did, message, phone_numbers, reference_id,
-                          scheduled_date_time, status_postback_url):
-        data = {"AssignedDID": assigned_did,
-                "LicenseKey": self.__license_key,
-                "Message": message,
-                "PhoneNumbers": phone_numbers,
-                "ReferenceID": reference_id,
-                "ScheduledDateTIme": scheduled_date_time,
-                "StatusPostbackURL": status_postback_url}
-        print data
-        #data = urllib.urlencode(data)
-        #request = urllib2.Request(request_url, data)
-        return self.__send_request(data, "AdvancedSMSSend")
+    def advanced_sms_send(self, assigned_did, message, phone_numbers, reference_id, scheduled_date_time, status_postback_url):
+        data = {"LicenseKey": self.__license_key,
+                "SMSRequests": [{"AssignedDID": assigned_did,
+                                 "Message": message,
+                                 "PhoneNumbers": phone_numbers,
+                                 "ReferenceID": reference_id,
+                                 "ScheduledDateTIme": scheduled_date_time,
+                                 "StatusPostbackURL": status_postback_url}]}
+        request_url = self.__sms_action_url + "/AdvancedSMSSend"
+        request = urllib2.Request(request_url, json.dumps(data), {"content-type": "application/json"})
+        response = self.__get_request(request)
+        return json.loads(response)
 
     # Message Status Functions
     def get_message_status(self, message_id):
