@@ -77,6 +77,9 @@ class session:
                 "ReferenceID": reference_id,
                 "ScheduledDateTIme": scheduled_date_time,
                 "StatusPostbackURL": status_postback_url}
+        print data
+        #data = urllib.urlencode(data)
+        #request = urllib2.Request(request_url, data)
         return self.__send_request(data, "AdvancedSMSSend")
 
     # Message Status Functions
