@@ -17,7 +17,10 @@ class session:
 
     def __xml_to_dictionary(self, xml):
         boolean_keys = ["Queued", "SMSIncomingMessages", "Sent", "Cancelled"]
-        root = etree.XML(xml)
+        if type(xml) != etree.Element:
+            root = etree.XML(xml)
+        else:
+            root = xml
         dictionary = {}
         if root is not None:
             for element in root.getchildren():
@@ -95,4 +98,13 @@ class session:
     # Get Unread Messages Functions
     def get_unread_incoming_messages(self):
         data = {"LicenseKey": self.__license_key}
-        return self.__send_request(data, "GetUnreadIncomingMessages")
+        request_url = self.__sms_action_url + "/GetUnreadIncomingMessages"
+        request_url += "?%s" % urllib.urlencode(data)
+        response = self.__get_request(request_url)
+        root = etree.XML(response)
+        messages = []
+        if root is not None:
+            for message in root.getchildren():
+                dictionary = self.__xml_to_dictionary(message)
+                messages.append(dictionary)
+        return messages
